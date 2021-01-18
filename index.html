@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cv Main</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="js/paper-full.js"></script>
+    
+    <script type="text/paperscript" canvas="canvas">
+        var seed = Date.now();
+        var ress = Math.ceil(screen.height/15);
+        var xtile = Math.ceil(screen.width/ress)+1;
+        var ytile = Math.ceil(screen.height/ress)+1;
+        
+        
+        var xtileh = xtile*2;
+        var total = xtileh * ytile;
+        for (var j = 0; j < ytile; j++) {
+            for (var i = 0; i < xtileh; i++) {
+                var path = new Path({
+                    fillColor: {
+                        hue: Math.random()*255,
+                        saturation: 1,
+                        brightness: 1
+                    },
+                    closed: true,
+                    opacity: 1
+                    });
+                var k = i*ress/2;
+                var k2= k - 0.5*ress
+                var l = j*ress;
+                var l2= l - 0.5*ress
+                if(i%2){
+                    path.add(new Point(k2,l));
+                    path.add(new Point(ress+k2, l));
+                    path.add(new Point(k2, ress+l));
+                } else {
+                    path.add(new Point(ress+k, ress+l));
+                    path.add(new Point(ress+k, l-1));
+                    path.add(new Point(k-1, ress+l));
+                }
+            }
+        }
+        
+        var children = project.activeLayer.children;
+        var mousePos = view.center;
+        var mpx = mousePos.x/ress;
+        var mpy = mousePos.y/ress;
+		var count = 0;
+        
+        function iterate(count) {
+			count = count+1;
+            for (var i = 0; i < total; i++) {
+                var path = children[i];
+				var baservalue = prand(i)/2 -0.4; //-0.4 to 0.6
+				var rvalue = baservalue + 0.1*Math.sin(0.01*count + baservalue*235.453);
+                var lvalue = Math.cos(0.1*distance(mpx,mpy,boxposx(i),boxposy(i))+1);
+                if(lvalue<0){lvalue=0;}
+                var fcol = new Color((rvalue+lvalue)/2);
+                if ((prand(seed*baservalue)>0.60)&&(-0.4<baservalue)&&(baservalue<0)) {
+                    var cseed = prand(seed*baservalue*3);
+                    if (cseed<0.1){fcol = makecolor(lvalue,144,133,194);}//7285c2
+						else {if (cseed<0.7) fcol = makecolor(lvalue,4,11,42);//040b2a
+							else {fcol = makecolor(lvalue,53,50,143);}//35328f
+							}
+                    
+                }
+                path.fillColor = fcol;
+            }
+        }
+		
+		function makecolor(value,r,g,b){
+			if (value>1.0) value = 1.0;
+			return new Color(r*value*0.0039216,g*value*0.0039216,b*value*0.0039216);
+		}
+        
+        function distance(x1,y1,x2,y2){
+            return Math.sqrt(Math.pow(x1-x2,2)+Math.pow(y1-y2,2))
+        }
+        
+        function boxposx(n){
+            return boxnumber(n)%xtile;
+        }
+        
+        function boxposy(n){
+            return Math.floor(boxnumber(n)/xtile);
+        }
+        
+        function boxnumber(n){
+            return Math.floor(n/2);
+        }
+        
+        function prand(n){
+            return (532*(Math.cos(Math.tan(n*2371498.3725489*seed)*64563453.8678356)+0.5))%1;
+        }
+
+        var fdel = -1;
+        function onFrame(event) {
+            if (fdel < 0){
+                iterate(event.count);
+                fdel = 3;
+                }
+            fdel--;
+        }
+
+        function onMouseMove(event) {
+            mousePos = event.point;
+            mpx = mousePos.x/ress -0.5;
+            mpy = mousePos.y/ress -0.5;
+        }
+        
+        var gbox = document.getElementsByClassName("gbox");
+        
+        window.onresize = function(event) {
+            
+        };
+    </script>
+</head>
+
+<body>
+    <div class="front">
+        <img src="Cvoid.png" class="title"/>
+        <div class="cbox">
+            <div class="nav">
+                <ul>
+                    <li><a href="index.html">Main</a></li>
+                    <!--<li><a href="about.html">About</a></li>
+                    <li><a href="projects.html">Projects</a></li>-->
+                    <li><a href="wip.html">WIP</a></li>
+                </ul>
+            </div>
+            <div class="content">
+				<p>Hey we're Cvoid, a 23 yeah old something. Prefer they/themselves or it/its.</p>
+				<h2>Links</h2>
+				<ul>
+					<li><a href="https://twitter.com/Cvoid_Wyvern">Twitter</a> @Cvoid_Wyvern</li>
+					<li><a href="https://steamcommunity.com/id/Cvoid">Steam</a> Cvoid</li>
+					<li><a href="https://discord.com/users/188102514875432960">Discord</a> Cvoid#6123</li>
+					<li><a href="https://t.me/cvoid">Telegram</a> @Cvoid</li>
+				</ul>
+            </div>
+        </div>
+    </div>
+    <div class="back">
+    <canvas id="canvas" resize></canvas>
+    </div>
+</body> 
+
+
+</html>
